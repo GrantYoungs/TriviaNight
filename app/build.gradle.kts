@@ -80,6 +80,11 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation("com.squareup.retrofit2:adapter-rxjava2:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.5.0")
+
+    // Moshi
+    val moshiVersion = "1.14.0"
+    implementation("com.squareup.moshi:moshi-adapters:$moshiVersion")
+    kapt("com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion")
 }
 
 kapt {

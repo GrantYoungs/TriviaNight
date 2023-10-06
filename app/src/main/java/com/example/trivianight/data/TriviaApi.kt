@@ -9,6 +9,9 @@ interface TriviaApi {
 
     @GET("api.php")
     suspend fun getTriviaQuestions(
-        @Query("amount") numQuestions: Int = 10
+        @Query("amount") numQuestions: Int = 5
     ): Response<TriviaQuestionsResponse>
+
+    @GET("api.php")
+    suspend fun test(): String = "This is just a test"
 }

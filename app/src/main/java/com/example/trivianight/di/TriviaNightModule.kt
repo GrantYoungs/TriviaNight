@@ -1,6 +1,8 @@
 package com.example.trivianight.di
 
 import com.example.trivianight.data.TriviaApi
+import com.example.trivianight.data.TriviaRepository
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,7 +11,6 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
@@ -30,7 +31,6 @@ object TriviaNightModule {
     @Provides
     fun provideBaseRetrofit(): Retrofit.Builder {
         return Retrofit.Builder()
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create())
     }
 
@@ -46,5 +46,13 @@ object TriviaNightModule {
             .client(okHttpClient)
             .build()
             .create(TriviaApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTriviaRepository(
+        triviaApi: TriviaApi
+    ): TriviaRepository {
+        return TriviaRepository(triviaApi = triviaApi)
     }
 }
