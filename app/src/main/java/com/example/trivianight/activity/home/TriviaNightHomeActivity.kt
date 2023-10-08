@@ -23,8 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.trivianight.R
+import com.example.trivianight.activity.game.TriviaNightGameActivity
 import com.example.trivianight.ui.theme.TriviaNightTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
@@ -80,22 +82,24 @@ class TriviaNightHomeActivity : ComponentActivity() {
                     }
                 }
 
-                LaunchedEffect(Unit) {
+                LaunchedEffect(true) {
                     viewModel.eventFlow.onEach { event ->
                         when (event) {
                             is TriviaNightHomeViewModel.Event.StartTriviaGame -> {
                                 startTriviaGame()
                             }
                         }
-                    }
+                    }.launchIn(this)
                 }
             }
         }
     }
-}
 
-private fun startTriviaGame() {
-
+    private fun startTriviaGame() {
+        startActivity(
+            TriviaNightGameActivity.newIntent(this)
+        )
+    }
 }
 
 @Composable

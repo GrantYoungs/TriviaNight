@@ -18,13 +18,20 @@
         <activity
             android:name=".activity.home.TriviaNightHomeActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.TriviaNight">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activity.game.TriviaNightGameActivity"
+            android:exported="true"
+            android:theme="@style/Theme.TriviaNight"
+            android:launchMode="singleTask"
+            android:parentActivityName=".activity.home.TriviaNightHomeActivity">
         </activity>
     </application>
 
