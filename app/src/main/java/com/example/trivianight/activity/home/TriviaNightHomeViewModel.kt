@@ -1,17 +1,16 @@
-package com.example.trivianight.ui
+package com.example.trivianight.activity.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trivianight.data.TriviaRepository
 import com.example.trivianight.data.model.domain.Question
-import com.example.trivianight.ui.TriviaNightHomeViewModel.Action.GetTriviaQuestions
-import com.example.trivianight.ui.TriviaNightHomeViewModel.Action.StartTriviaGame
+import com.example.trivianight.activity.home.TriviaNightHomeViewModel.Action.GetTriviaQuestions
+import com.example.trivianight.activity.home.TriviaNightHomeViewModel.Action.StartTriviaGame
 import com.example.trivianight.util.stateflow.ViewModelFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 import javax.inject.Inject

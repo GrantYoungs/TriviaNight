@@ -1,4 +1,4 @@
-package com.example.trivianight.ui
+package com.example.trivianight.activity.home
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
