@@ -14,17 +14,19 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.example.trivianight.ui.theme.DefaultDarkTheme
+import com.example.trivianight.ui.theme.DefaultLightTheme
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = DefaultDarkTheme.Purple80,
+    secondary = DefaultDarkTheme.PurpleGrey80,
+    tertiary = DefaultDarkTheme.Pink80
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = DefaultLightTheme.Purple40,
+    secondary = DefaultLightTheme.PurpleGrey40,
+    tertiary = DefaultLightTheme.Pink40
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
