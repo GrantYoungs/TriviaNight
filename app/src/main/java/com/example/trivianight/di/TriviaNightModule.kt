@@ -2,7 +2,6 @@ package com.example.trivianight.di
 
 import com.example.trivianight.data.TriviaApi
 import com.example.trivianight.data.TriviaRepository
-import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

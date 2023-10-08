@@ -15,7 +15,7 @@ object DefaultLightTheme {
 }
 
 object MintyFreshTheme {
-    
+
     // Primary color
     val LimeGreen = Color(0xFF00FF00)
 
