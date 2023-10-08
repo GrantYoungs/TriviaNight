@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trivianight.data.TriviaRepository
+import com.example.trivianight.data.model.domain.Question
 import com.example.trivianight.ui.TriviaNightHomeViewModel.TriviaNightHomeAction.GetTriviaQuestions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,8 @@ class TriviaNightHomeViewModel @Inject constructor(
 
     data class HomeViewState(
         val isLoading: Boolean = false,
-        val homeMessage: String = "Welcome to Trivia Night!"
+        val homeMessage: String = "Get questions",
+        val triviaQuestions: List<Question> = emptyList()
     )
 
     fun onAction(action: TriviaNightHomeAction) {
@@ -40,16 +42,16 @@ class TriviaNightHomeViewModel @Inject constructor(
             setLoadingState(true)
 
             runCatching {
-                val questions = triviaRepository.getTriviaQuestions(numQuestions = 5)
-
+                triviaRepository.getTriviaQuestions(numQuestions = 5)
+            }.onSuccess { questions ->
                 _viewState.update { oldState ->
                     oldState.copy(
                         isLoading = false,
-                        homeMessage = "${questions.results.size} questions ready!"
+                        triviaQuestions = questions
                     )
                 }
-            }.onFailure {
-                Log.e("fuck", it.message.orEmpty())
+            }.onFailure { exception ->
+                Log.e("Error", exception.message.orEmpty())
                 setLoadingState(false)
             }
         }

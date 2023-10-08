@@ -1,13 +1,15 @@
 package com.example.trivianight.data
 
-import com.example.trivianight.data.model.domain.TriviaQuestions
+import com.example.trivianight.data.error.TriviaResponseException
+import com.example.trivianight.data.model.domain.Question
 import com.example.trivianight.data.model.network.toDomain
 import com.example.trivianight.util.retrofit.bodyOrError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val SUCCESS_CODE = 0
 
 @Singleton
 class TriviaRepository @Inject constructor(
@@ -16,10 +18,16 @@ class TriviaRepository @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    suspend fun getTriviaQuestions(numQuestions: Int): TriviaQuestions {
+    suspend fun getTriviaQuestions(numQuestions: Int = 5): List<Question> {
         return withContext(ioDispatcher) {
-            triviaApi.getTriviaQuestions().let { response ->
-                response.bodyOrError()!!.toDomain()
+            triviaApi.getTriviaQuestions(numQuestions = numQuestions).let { response ->
+                response.bodyOrError()!!.toDomain().let { questions ->
+                    if (questions.responseCode == SUCCESS_CODE) {
+                        return@withContext questions.results
+                    } else {
+                        throw TriviaResponseException.UnableToRetrieveQuestions
+                    }
+                }
             }
         }
     }

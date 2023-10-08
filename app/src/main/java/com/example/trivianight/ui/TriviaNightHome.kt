@@ -6,7 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -59,6 +64,26 @@ class TriviaNightHome : ComponentActivity() {
                                 modifier = Modifier.size(36.dp)
                             )
                         }
+                    }
+
+                    LazyColumn(
+                        state = rememberLazyListState(),
+                        modifier = Modifier
+                            .padding(top = 50.dp)
+                            .fillMaxWidth(0.85f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        items(
+                            items = viewState.triviaQuestions,
+                            itemContent = { question ->
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 5.dp),
+                                    text = question.question
+                                )
+                            }
+                        )
                     }
                 }
             }
