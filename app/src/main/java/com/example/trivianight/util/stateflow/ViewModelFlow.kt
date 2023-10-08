@@ -19,8 +19,10 @@ class ViewModelFlow<ViewState, Event>(initialState: ViewState) {
     /**
      * Update this ViewState.
      */
-    fun update(state: ViewState) {
-        _viewState.update { state }
+    fun update(stateChange: (ViewState) -> ViewState) {
+        stateChange.invoke(_viewState.value).run {
+            _viewState.update(stateChange)
+        }
     }
 
     /**

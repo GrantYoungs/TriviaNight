@@ -5,11 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trivianight.data.TriviaRepository
 import com.example.trivianight.data.model.domain.Question
-import com.example.trivianight.ui.TriviaNightHomeViewModel.TriviaNightHomeAction.GetTriviaQuestions
+import com.example.trivianight.ui.TriviaNightHomeViewModel.Action.GetTriviaQuestions
+import com.example.trivianight.ui.TriviaNightHomeViewModel.Action.StartTriviaGame
+import com.example.trivianight.util.stateflow.ViewModelFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -20,8 +21,11 @@ class TriviaNightHomeViewModel @Inject constructor(
     private val triviaRepository: TriviaRepository
 ) : ViewModel() {
 
-    private val _viewState: MutableStateFlow<HomeViewState> = MutableStateFlow(HomeViewState(isLoading = false))
-    val viewState: StateFlow<HomeViewState> get() = _viewState.asStateFlow()
+    private val _viewStateEventFlow = ViewModelFlow<HomeViewState, Event>(HomeViewState(isLoading = false))
+
+    val viewStateFlow: StateFlow<HomeViewState> get() = _viewStateEventFlow.viewState
+    val eventFlow: SharedFlow<Event> get() = _viewStateEventFlow.events
+
 
     data class HomeViewState(
         val isLoading: Boolean = false,
@@ -29,10 +33,14 @@ class TriviaNightHomeViewModel @Inject constructor(
         val triviaQuestions: List<Question> = emptyList()
     )
 
-    fun onAction(action: TriviaNightHomeAction) {
+    fun onAction(action: Action) {
         when (action) {
             is GetTriviaQuestions -> {
                 getTriviaQuestions()
+            }
+
+            is StartTriviaGame -> {
+                startTriviaGame()
             }
         }
     }
@@ -44,7 +52,7 @@ class TriviaNightHomeViewModel @Inject constructor(
             runCatching {
                 triviaRepository.getTriviaQuestions(numQuestions = 5)
             }.onSuccess { questions ->
-                _viewState.update { oldState ->
+                _viewStateEventFlow.update { oldState ->
                     oldState.copy(
                         isLoading = false,
                         triviaQuestions = questions
@@ -57,11 +65,20 @@ class TriviaNightHomeViewModel @Inject constructor(
         }
     }
 
-    private fun setLoadingState(isLoading: Boolean) {
-        _viewState.update { oldState -> oldState.copy(isLoading = isLoading) }
+    private fun startTriviaGame() {
+        _viewStateEventFlow.emit(Event.StartTriviaGame)
     }
 
-    sealed class TriviaNightHomeAction {
-        object GetTriviaQuestions: TriviaNightHomeAction()
+    private fun setLoadingState(isLoading: Boolean) {
+        _viewStateEventFlow.update { oldState -> oldState.copy(isLoading = isLoading) }
+    }
+
+    sealed class Action {
+        object GetTriviaQuestions : Action()
+        object StartTriviaGame : Action()
+    }
+
+    sealed class Event {
+        object StartTriviaGame : Event()
     }
 }
