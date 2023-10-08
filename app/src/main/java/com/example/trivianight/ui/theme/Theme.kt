@@ -28,7 +28,8 @@ private val LightColorScheme = lightColorScheme(
 
     primary = BeachDayTheme.SkyBlue,
     secondary = BeachDayTheme.Gold,
-    tertiary = BeachDayTheme.HotPink
+    tertiary = BeachDayTheme.HotPink,
+    background = BeachDayTheme.HotPink
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

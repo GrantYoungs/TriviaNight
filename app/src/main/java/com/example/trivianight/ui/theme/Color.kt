@@ -30,6 +30,10 @@ object BeachDayTheme {
     val Gold = Color(0xFFFFD700)
     val SkyBlue = Color(0xFF87CEEB)
     val HotPink = Color(0xFFFF69B4)
+    val HotPinkFaded = Color(0x8AFF69B4)
+
+    val OrangeFaded = Color(0xFFFC610D)
+    val SandyBeach = Color(0xFFF0E68C)
 }
 
 object CandyTheme {
