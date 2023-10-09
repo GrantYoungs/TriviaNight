@@ -50,8 +50,7 @@ class TriviaNightHomeActivity : ComponentActivity() {
                         val (title, getStartedButton) = createRefs()
 
                         Text(
-                            // text = stringResource(R.string.welcome_to_trivia_night),
-                            text = viewState.homeMessage,
+                            text = stringResource(viewState.homeMessage),
                             modifier = Modifier.constrainAs(title) {
                                 start.linkTo(parent.start)
                                 end.linkTo(parent.end)

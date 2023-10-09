@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Trivia Night</string>
 
-    <string name="welcome_to_trivia_night">Trivia Night!</string>
+    <string name="welcome_to_trivia_night">Welcome to Trivia Night!</string>
     <string name="lets_play">Let\'s play!</string>
     <string name="next_question">Next Question</string>
 </resources>

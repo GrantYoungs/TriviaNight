@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 // The default number of questions to retrieve.
 // TODO: Take user input for number of questions
-private const val NUM_QUESTIONS = 2
+private const val NUM_QUESTIONS = 3
 
 @HiltViewModel
 class TriviaNightGameViewModel @Inject constructor(
@@ -33,7 +33,7 @@ class TriviaNightGameViewModel @Inject constructor(
     data class GameViewState(
         val isLoading: Boolean = false,
         private val triviaQuestions: List<Question> = emptyList(),
-        private val currentQuestionIndex: Int = 0,
+        val currentQuestionIndex: Int = 0,
         val message: String = "Getting questions"
     ) {
         val currentQuestion: Question?
@@ -43,7 +43,7 @@ class TriviaNightGameViewModel @Inject constructor(
     fun onAction(action: Action) {
         when (action) {
             is Action.DisplayNextQuestion -> {
-                
+                displayNextQuestion()
             }
         }
     }
@@ -59,6 +59,7 @@ class TriviaNightGameViewModel @Inject constructor(
                     oldState.copy(
                         isLoading = false,
                         triviaQuestions = questions,
+                        currentQuestionIndex = 0,
                         message = "${questions.size} questions ready!"
                     )
                 }
@@ -66,6 +67,18 @@ class TriviaNightGameViewModel @Inject constructor(
                 Log.e("Error", exception.message.orEmpty())
                 setLoadingState(false)
             }
+        }
+    }
+
+    private fun displayNextQuestion() {
+        _viewStateFlow.update { oldState ->
+            oldState.copy(
+                currentQuestionIndex = oldState.currentQuestionIndex + 1
+            )
+        }
+
+        if (_viewStateFlow.viewState.value.currentQuestion == null) {
+            getTriviaQuestions(numQuestions = NUM_QUESTIONS)
         }
     }
 
