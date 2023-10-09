@@ -1,60 +1,65 @@
-package com.example.trivianight.activity.home
+package com.example.trivianight.activity.game
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trivianight.data.TriviaRepository
 import com.example.trivianight.data.model.domain.Question
-import com.example.trivianight.activity.home.TriviaNightHomeViewModel.Action.GetTriviaQuestions
-import com.example.trivianight.activity.home.TriviaNightHomeViewModel.Action.StartTriviaGame
 import com.example.trivianight.util.stateflow.ViewModelFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-
 import javax.inject.Inject
 
+// The default number of questions to retrieve.
+// TODO: Take user input for number of questions
+private const val NUM_QUESTIONS = 2
+
 @HiltViewModel
-class TriviaNightHomeViewModel @Inject constructor(
+class TriviaNightGameViewModel @Inject constructor(
     private val triviaRepository: TriviaRepository
 ) : ViewModel() {
 
-    private val _viewStateFlow = ViewModelFlow<HomeViewState, Event>(HomeViewState(isLoading = false))
+    private val _viewStateFlow = ViewModelFlow<GameViewState, Event>(GameViewState(isLoading = false))
 
-    val viewState: StateFlow<HomeViewState> get() = _viewStateFlow.viewState
+    val viewState: StateFlow<GameViewState> get() = _viewStateFlow.viewState
     val eventFlow: SharedFlow<Event> get() = _viewStateFlow.events
 
+    init {
+        getTriviaQuestions(numQuestions = NUM_QUESTIONS)
+    }
 
-    data class HomeViewState(
+    data class GameViewState(
         val isLoading: Boolean = false,
-        val homeMessage: String = "Get questions",
-        val triviaQuestions: List<Question> = emptyList()
-    )
+        private val triviaQuestions: List<Question> = emptyList(),
+        private val currentQuestionIndex: Int = 0,
+        val message: String = "Getting questions"
+    ) {
+        val currentQuestion: Question?
+            get() = triviaQuestions.getOrNull(currentQuestionIndex)
+    }
 
     fun onAction(action: Action) {
         when (action) {
-            is GetTriviaQuestions -> {
-                getTriviaQuestions()
-            }
-
-            is StartTriviaGame -> {
-                startTriviaGame()
+            is Action.DisplayNextQuestion -> {
+                
             }
         }
     }
 
-    private fun getTriviaQuestions() {
+    private fun getTriviaQuestions(numQuestions: Int) {
         viewModelScope.launch {
             setLoadingState(true)
 
             runCatching {
-                triviaRepository.getTriviaQuestions(numQuestions = 5)
+                triviaRepository.getTriviaQuestions(numQuestions = numQuestions)
             }.onSuccess { questions ->
                 _viewStateFlow.update { oldState ->
                     oldState.copy(
                         isLoading = false,
-                        triviaQuestions = questions
+                        triviaQuestions = questions,
+                        message = "${questions.size} questions ready!"
                     )
                 }
             }.onFailure { exception ->
@@ -64,20 +69,15 @@ class TriviaNightHomeViewModel @Inject constructor(
         }
     }
 
-    private fun startTriviaGame() {
-        _viewStateFlow.emit(Event.StartTriviaGame)
-    }
-
     private fun setLoadingState(isLoading: Boolean) {
         _viewStateFlow.update { oldState -> oldState.copy(isLoading = isLoading) }
     }
 
     sealed class Action {
-        object GetTriviaQuestions : Action()
-        object StartTriviaGame : Action()
+        object DisplayNextQuestion : Action()
     }
 
     sealed class Event {
-        object StartTriviaGame : Event()
+
     }
 }

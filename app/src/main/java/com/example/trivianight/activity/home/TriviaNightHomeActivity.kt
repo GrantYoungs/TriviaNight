@@ -37,7 +37,7 @@ class TriviaNightHomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TriviaNightTheme(dynamicColor = false) {
-                val viewState by remember { viewModel.viewStateFlow }.collectAsState()
+                val viewState by remember { viewModel.viewState }.collectAsState()
 
                 // A surface container using the 'background' color from the theme
                 Surface(
