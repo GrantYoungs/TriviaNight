@@ -53,7 +53,12 @@ fun QuestionResponse.toDomain(): Question {
         correctAnswer = Answer(value = fromHtml(correctAnswer), isCorrect = true),
         incorrectAnswers = incorrectAnswers.map {
             Answer(value = fromHtml(it), isCorrect = false)
-        }
+        },
+
+        // TODO possibly move the shuffling to the viewModel
+        allAnswers = incorrectAnswers.map {
+            Answer(value = fromHtml(it), isCorrect = false)
+        }.plus(Answer(value = fromHtml(correctAnswer), isCorrect = true)).shuffled()
     )
 }
 

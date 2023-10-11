@@ -84,7 +84,7 @@ class TriviaNightGameActivity : ComponentActivity() {
                                         centerVerticallyTo(parent)
                                     }
                             ) {
-                                question.possibleAnswers.forEach { answer ->
+                                question.allAnswers.forEach { answer ->
                                     val buttonColor = if (viewState.userHasGuessed && answer.isCorrect) Color.Green else MaterialTheme.colorScheme.primary
                                     val disabledColor = buttonColor.copy(alpha = 0.38f)
 
