@@ -1,7 +1,7 @@
 package com.example.trivianight.data.model.network
 
-import android.os.Build
 import android.text.Html
+import com.example.trivianight.data.model.domain.Answer
 import com.example.trivianight.data.model.domain.Question
 import com.example.trivianight.data.model.domain.TriviaQuestions
 import com.squareup.moshi.Json
@@ -50,8 +50,10 @@ fun QuestionResponse.toDomain(): Question {
         type = fromHtml(type),
         difficulty = fromHtml(difficulty),
         question = fromHtml(question),
-        correctAnswer = fromHtml(correctAnswer),
-        incorrectAnswers = incorrectAnswers.map { fromHtml(it) }
+        correctAnswer = Answer(value = fromHtml(correctAnswer), isCorrect = true),
+        incorrectAnswers = incorrectAnswers.map {
+            Answer(value = fromHtml(it), isCorrect = false)
+        }
     )
 }
 

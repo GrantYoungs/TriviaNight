@@ -34,7 +34,7 @@ class TriviaNightGameViewModel @Inject constructor(
         val isLoading: Boolean = false,
         private val triviaQuestions: List<Question> = emptyList(),
         val currentQuestionIndex: Int = 0,
-        val message: String = "Getting questions"
+        val userHasGuessed: Boolean = false
     ) {
         val currentQuestion: Question?
             get() = triviaQuestions.getOrNull(currentQuestionIndex)
@@ -64,7 +64,6 @@ class TriviaNightGameViewModel @Inject constructor(
                         isLoading = false,
                         triviaQuestions = questions,
                         currentQuestionIndex = 0,
-                        message = "${questions.size} questions ready!"
                     )
                 }
             }.onFailure { exception ->
@@ -75,13 +74,20 @@ class TriviaNightGameViewModel @Inject constructor(
     }
 
     private fun checkAnswer(answer: String) {
+        _viewStateFlow.update { oldState ->
+            oldState.copy(userHasGuessed = true)
+        }
 
+        if (answer == _viewStateFlow.viewState.value.currentQuestion?.correctAnswer?.value) {
+
+        }
     }
 
     private fun displayNextQuestion() {
         _viewStateFlow.update { oldState ->
             oldState.copy(
-                currentQuestionIndex = oldState.currentQuestionIndex + 1
+                currentQuestionIndex = oldState.currentQuestionIndex + 1,
+                userHasGuessed = false
             )
         }
 

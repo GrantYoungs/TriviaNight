@@ -2,6 +2,7 @@ package com.example.trivianight.activity.game
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.ui.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -84,19 +85,29 @@ class TriviaNightGameActivity : ComponentActivity() {
                                     }
                             ) {
                                 question.possibleAnswers.forEach { answer ->
+                                    val buttonColor = if (viewState.userHasGuessed && answer.isCorrect) Color.Green else MaterialTheme.colorScheme.primary
+                                    val disabledColor = buttonColor.copy(alpha = 0.38f)
+
                                     Button(
                                         onClick = {
-                                            viewModel.onAction(TriviaNightGameViewModel.Action.CheckAnswer(answer = answer))
+                                            viewModel.onAction(
+                                                TriviaNightGameViewModel.Action.CheckAnswer(answer = answer.value)
+                                            )
                                         },
+                                        enabled = viewState.userHasGuessed.not(),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(bottom = 10.dp),
                                         elevation = ButtonDefaults.buttonElevation(
                                             defaultElevation = 3.dp
+                                        ),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = (if (viewState.userHasGuessed && answer.isCorrect) Color.Green else MaterialTheme.colorScheme.primary),
+                                            disabledContainerColor = disabledColor
                                         )
                                     ) {
                                         Text(
-                                            text = answer,
+                                            text = answer.value,
                                             textAlign = TextAlign.Center,
                                             style = MaterialTheme.typography.titleLarge
                                         )

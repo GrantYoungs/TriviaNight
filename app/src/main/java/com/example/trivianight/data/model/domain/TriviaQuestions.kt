@@ -10,8 +10,14 @@ data class Question(
     val type: String,
     val difficulty: String,
     val question: String,
-    val correctAnswer: String,
-    val incorrectAnswers: List<String>
+    val correctAnswer: Answer,
+    val incorrectAnswers: List<Answer>
 ) {
-    val possibleAnswers: List<String> get() = incorrectAnswers.plus(correctAnswer).shuffled()
+    val possibleAnswers: List<Answer> get() = incorrectAnswers.plus(correctAnswer).shuffled()
 }
+
+data class Answer(
+    val value: String,
+    val isCorrect: Boolean,
+
+)
