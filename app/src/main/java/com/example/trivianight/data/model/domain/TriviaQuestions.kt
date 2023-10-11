@@ -12,4 +12,6 @@ data class Question(
     val question: String,
     val correctAnswer: String,
     val incorrectAnswers: List<String>
-)
+) {
+    val possibleAnswers: List<String> get() = incorrectAnswers.plus(correctAnswer).shuffled()
+}

@@ -6,9 +6,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,7 +49,7 @@ class TriviaNightGameActivity : ComponentActivity() {
                     ConstraintLayout(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        val (questionTitle, loadingIndicator, nextQuestionButton) = createRefs()
+                        val (questionTitle, loadingIndicator, nextQuestionButton, answersList) = createRefs()
 
                         if (viewState.isLoading) {
                             CircularProgressIndicator(
@@ -64,14 +66,43 @@ class TriviaNightGameActivity : ComponentActivity() {
                             Text(
                                 text = question.question,
                                 modifier = Modifier
-                                    .fillMaxWidth(0.75f)
+                                    .fillMaxWidth(0.80f)
                                     .constrainAs(questionTitle) {
-                                        top.linkTo(parent.top, 100.dp)
+                                        top.linkTo(parent.top, 80.dp)
                                         centerHorizontallyTo(parent)
                                     },
                                 textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleLarge
+                                style = MaterialTheme.typography.headlineMedium
                             )
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.65f)
+                                    .constrainAs(answersList) {
+                                        centerHorizontallyTo(parent)
+                                        centerVerticallyTo(parent)
+                                    }
+                            ) {
+                                question.possibleAnswers.forEach { answer ->
+                                    Button(
+                                        onClick = {
+                                            viewModel.onAction(TriviaNightGameViewModel.Action.CheckAnswer(answer = answer))
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 10.dp),
+                                        elevation = ButtonDefaults.buttonElevation(
+                                            defaultElevation = 3.dp
+                                        )
+                                    ) {
+                                        Text(
+                                            text = answer,
+                                            textAlign = TextAlign.Center,
+                                            style = MaterialTheme.typography.titleLarge
+                                        )
+                                    }
+                                }
+                            }
                         }
 
                         Button(
@@ -90,7 +121,9 @@ class TriviaNightGameActivity : ComponentActivity() {
                             )
                         ) {
                             Text(
-                                text = stringResource(R.string.next_question)
+                                text = stringResource(R.string.next_question),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.titleLarge
                             )
                         }
                     }

@@ -45,6 +45,10 @@ class TriviaNightGameViewModel @Inject constructor(
             is Action.DisplayNextQuestion -> {
                 displayNextQuestion()
             }
+
+            is Action.CheckAnswer -> {
+                checkAnswer(action.answer)
+            }
         }
     }
 
@@ -70,6 +74,10 @@ class TriviaNightGameViewModel @Inject constructor(
         }
     }
 
+    private fun checkAnswer(answer: String) {
+
+    }
+
     private fun displayNextQuestion() {
         _viewStateFlow.update { oldState ->
             oldState.copy(
@@ -88,6 +96,8 @@ class TriviaNightGameViewModel @Inject constructor(
 
     sealed class Action {
         object DisplayNextQuestion : Action()
+
+        data class CheckAnswer(val answer: String) : Action()
     }
 
     sealed class Event {
