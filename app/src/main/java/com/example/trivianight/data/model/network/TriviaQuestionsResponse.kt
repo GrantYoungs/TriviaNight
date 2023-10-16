@@ -7,6 +7,18 @@ import com.example.trivianight.data.model.domain.TriviaQuestions
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+enum class ResponseCode(val value: Int) {
+    SUCCESS(0),
+    NO_RESPONSE(1),
+    INVALID_PARAMETER(2),
+    TOKEN_NOT_FOUND(3),
+    TOKEN_EMPTY(4);
+
+    companion object {
+        fun getResponseCode(code: Int): ResponseCode = ResponseCode.values().first { it.value == code }
+    }
+}
+
 @JsonClass(generateAdapter = true)
 data class TriviaQuestionsResponse(
     @Json(name = "response_code")

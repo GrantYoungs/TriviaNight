@@ -7,11 +7,15 @@ import retrofit2.http.Query
 
 interface TriviaApi {
 
+    /**
+     * Retrieves trivia questions to be displayed to the user.
+     *
+     * @param numQuestions The number of questions to retrieve.
+     *
+     * @return [TriviaQuestionsResponse]
+     */
     @GET("api.php")
     suspend fun getTriviaQuestions(
         @Query("amount") numQuestions: Int
     ): Response<TriviaQuestionsResponse>
-
-    @GET("api.php")
-    suspend fun test(): String = "This is just a test"
 }
