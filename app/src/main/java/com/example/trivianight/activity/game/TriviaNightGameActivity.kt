@@ -2,7 +2,6 @@ package com.example.trivianight.activity.game
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.ui.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -102,7 +102,7 @@ class TriviaNightGameActivity : ComponentActivity() {
                                             defaultElevation = 3.dp
                                         ),
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = (if (viewState.userHasGuessed && answer.isCorrect) Color.Green else MaterialTheme.colorScheme.primary),
+                                            containerColor = buttonColor,
                                             disabledContainerColor = disabledColor
                                         )
                                     ) {
