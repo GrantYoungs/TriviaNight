@@ -6,6 +6,9 @@ import com.example.trivianight.data.model.network.ResponseCode
 import com.example.trivianight.data.model.network.toDomain
 import com.example.trivianight.util.retrofit.bodyOrError
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,6 +20,9 @@ class TriviaRepository @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
+    private val _gameState = MutableStateFlow(TriviaGameState())
+    val gameState = _gameState.asStateFlow()
+
     suspend fun getTriviaQuestions(numQuestions: Int = 5): List<Question> {
         return withContext(ioDispatcher) {
             triviaApi.getTriviaQuestions(numQuestions = numQuestions).let { response ->
@@ -24,6 +30,11 @@ class TriviaRepository @Inject constructor(
 
                     when (ResponseCode.getResponseCode(questions.responseCode)) {
                         ResponseCode.SUCCESS -> {
+                            _gameState.update { oldState ->
+                                oldState.copy(
+                                    triviaQuestions = questions.results
+                                )
+                            }
                             return@withContext questions.results
                         }
 
@@ -49,6 +60,12 @@ class TriviaRepository @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun onCorrectAnswer() {
+        _gameState.update { oldState ->
+            oldState.copy(numCorrectAnswers = oldState.numCorrectAnswers + 1)
         }
     }
 }

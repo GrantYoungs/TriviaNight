@@ -3,6 +3,7 @@ package com.example.trivianight.activity.game
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.trivianight.data.TriviaGameState
 import com.example.trivianight.data.TriviaRepository
 import com.example.trivianight.data.model.domain.Question
 import com.example.trivianight.util.stateflow.ViewModelFlow
@@ -27,7 +28,21 @@ class TriviaNightGameViewModel @Inject constructor(
     val eventFlow: SharedFlow<Event> get() = _viewStateFlow.events
 
     init {
+        viewModelScope.launch {
+            triviaRepository.gameState.collect { gameState ->
+                onNewGameState(gameState)
+            }
+        }
+
         getTriviaQuestions(numQuestions = NUM_QUESTIONS)
+    }
+
+    private fun onNewGameState(gameState: TriviaGameState) {
+        _viewStateFlow.update { oldState ->
+            oldState.copy(
+                numCorrectAnswers = gameState.numCorrectAnswers.toString()
+            )
+        }
     }
 
     data class GameViewState(
@@ -35,7 +50,8 @@ class TriviaNightGameViewModel @Inject constructor(
         private val triviaQuestions: List<Question> = emptyList(),
         val currentQuestionIndex: Int = 0,
         val userHasGuessed: Boolean = false,
-        val displayErrorDialog: Boolean = false
+        val displayErrorDialog: Boolean = false,
+        val numCorrectAnswers: String = "",
     ) {
         val currentQuestion: Question?
             get() = triviaQuestions.getOrNull(currentQuestionIndex)
@@ -93,7 +109,7 @@ class TriviaNightGameViewModel @Inject constructor(
         }
 
         if (answer == _viewStateFlow.viewState.value.currentQuestion?.correctAnswer?.value) {
-
+            triviaRepository.onCorrectAnswer()
         }
     }
 
