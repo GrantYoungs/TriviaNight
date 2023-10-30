@@ -1,7 +1,6 @@
 package com.example.trivianight.data
 
 import com.example.trivianight.data.error.TriviaResponseException
-import com.example.trivianight.data.model.domain.Question
 import com.example.trivianight.data.model.network.ResponseCode
 import com.example.trivianight.data.model.network.toDomain
 import com.example.trivianight.util.retrofit.bodyOrError
@@ -23,8 +22,13 @@ class TriviaRepository @Inject constructor(
     private val _gameState = MutableStateFlow(TriviaGameState())
     val gameState = _gameState.asStateFlow()
 
-    suspend fun getTriviaQuestions(numQuestions: Int = 5): List<Question> {
-        return withContext(ioDispatcher) {
+    /**
+     * Retrieve a list of Trivia Questions.
+     *
+     * @param numQuestions The number of questions to retrieve.
+     */
+    suspend fun getTriviaQuestions(numQuestions: Int) {
+        withContext(ioDispatcher) {
             triviaApi.getTriviaQuestions(numQuestions = numQuestions).let { response ->
                 response.bodyOrError()!!.toDomain().let { questions ->
 
@@ -32,10 +36,10 @@ class TriviaRepository @Inject constructor(
                         ResponseCode.SUCCESS -> {
                             _gameState.update { oldState ->
                                 oldState.copy(
-                                    triviaQuestions = questions.results
+                                    triviaQuestions = questions.results,
+                                    currentQuestionIndex = 0
                                 )
                             }
-                            return@withContext questions.results
                         }
 
                         ResponseCode.NO_RESPONSE -> {
@@ -63,9 +67,30 @@ class TriviaRepository @Inject constructor(
         }
     }
 
+    /**
+     * To be called when the user selects the correct answer.
+     */
     fun onCorrectAnswer() {
         _gameState.update { oldState ->
             oldState.copy(numCorrectAnswers = oldState.numCorrectAnswers + 1)
+        }
+    }
+
+    /**
+     * To be called when the user selects the incorrect answer.
+     */
+    fun onIncorrectAnswer() {
+        _gameState.update { oldState ->
+            oldState.copy(numIncorrectAnswers = oldState.numIncorrectAnswers + 1)
+        }
+    }
+
+    /**
+     * Navigates to the next question by increasing the current question index.
+     */
+    fun moveToNextQuestion() {
+        _gameState.update { oldState ->
+            oldState.copy(currentQuestionIndex = oldState.currentQuestionIndex + 1)
         }
     }
 }

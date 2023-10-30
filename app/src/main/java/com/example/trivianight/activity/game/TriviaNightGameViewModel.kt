@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trivianight.data.TriviaGameState
 import com.example.trivianight.data.TriviaRepository
-import com.example.trivianight.data.model.domain.Question
+import com.example.trivianight.ui.decorators.QuestionDecorator
 import com.example.trivianight.util.stateflow.ViewModelFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharedFlow
@@ -40,22 +40,24 @@ class TriviaNightGameViewModel @Inject constructor(
     private fun onNewGameState(gameState: TriviaGameState) {
         _viewStateFlow.update { oldState ->
             oldState.copy(
-                numCorrectAnswers = gameState.numCorrectAnswers.toString()
+                numCorrectAnswers = gameState.numCorrectAnswers.toString(),
+                numIncorrectAnswers = gameState.numIncorrectAnswers.toString(),
+                currentQuestion = gameState.currentQuestion?.let { question ->
+                    QuestionDecorator.decorate(question = question)
+                }
             )
         }
     }
 
     data class GameViewState(
         val isLoading: Boolean = false,
-        private val triviaQuestions: List<Question> = emptyList(),
-        val currentQuestionIndex: Int = 0,
+        val currentQuestion: QuestionDecorator? = null,
+        // val currentQuestionIndex: Int = 0,
         val userHasGuessed: Boolean = false,
         val displayErrorDialog: Boolean = false,
         val numCorrectAnswers: String = "",
-    ) {
-        val currentQuestion: Question?
-            get() = triviaQuestions.getOrNull(currentQuestionIndex)
-    }
+        val numIncorrectAnswers: String = "",
+    )
 
     fun onAction(action: Action) {
         when (action) {
@@ -83,14 +85,8 @@ class TriviaNightGameViewModel @Inject constructor(
 
             runCatching {
                 triviaRepository.getTriviaQuestions(numQuestions = numQuestions)
-            }.onSuccess { questions ->
-                _viewStateFlow.update { oldState ->
-                    oldState.copy(
-                        isLoading = false,
-                        triviaQuestions = questions,
-                        currentQuestionIndex = 0,
-                    )
-                }
+            }.onSuccess {
+                setLoadingState(false)
             }.onFailure { exception ->
                 Log.e("Error", exception.message.orEmpty())
                 setLoadingState(false)
@@ -110,13 +106,16 @@ class TriviaNightGameViewModel @Inject constructor(
 
         if (answer == _viewStateFlow.viewState.value.currentQuestion?.correctAnswer?.value) {
             triviaRepository.onCorrectAnswer()
+        } else {
+            triviaRepository.onIncorrectAnswer()
         }
     }
 
     private fun displayNextQuestion() {
+        triviaRepository.moveToNextQuestion()
+
         _viewStateFlow.update { oldState ->
             oldState.copy(
-                currentQuestionIndex = oldState.currentQuestionIndex + 1,
                 userHasGuessed = false
             )
         }

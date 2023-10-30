@@ -52,7 +52,9 @@ class TriviaNightGameActivity : ComponentActivity() {
                     ConstraintLayout(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        val (questionTitle, loadingIndicator, nextQuestionButton, answersList, numCorrectAnswers) = createRefs()
+                        val (questionTitle, loadingIndicator, nextQuestionButton,
+                            answersList, numCorrectAnswers, numIncorrectAnswers
+                        ) = createRefs()
 
                         if (viewState.isLoading) {
                             CircularProgressIndicator(
@@ -123,7 +125,16 @@ class TriviaNightGameActivity : ComponentActivity() {
                             style = MaterialTheme.typography.displayLarge,
                             color = Color.Green,
                             modifier = Modifier.constrainAs(numCorrectAnswers) {
-                                centerHorizontallyTo(parent)
+                                start.linkTo(parent.start, 24.dp)
+                                bottom.linkTo(nextQuestionButton.top, 16.dp)
+                            }
+                        )
+                        Text(
+                            text = viewState.numIncorrectAnswers,
+                            style = MaterialTheme.typography.displayLarge,
+                            color = Color.Red,
+                            modifier = Modifier.constrainAs(numIncorrectAnswers) {
+                                end.linkTo(parent.end, 24.dp)
                                 bottom.linkTo(nextQuestionButton.top, 16.dp)
                             }
                         )
