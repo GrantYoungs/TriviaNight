@@ -69,7 +69,7 @@ class TriviaNightGameActivity : ComponentActivity() {
                             Text(
                                 text = question.question,
                                 modifier = Modifier
-                                    .fillMaxWidth(0.80f)
+                                    .fillMaxWidth(0.85f)
                                     .constrainAs(questionTitle) {
                                         top.linkTo(parent.top, 80.dp)
                                         centerHorizontallyTo(parent)
@@ -179,14 +179,22 @@ class TriviaNightGameActivity : ComponentActivity() {
                 TextButton(
                     onClick = onConfirmation
                 ) {
-                    Text(text = stringResource(R.string.retry_button))
+                    Text(
+                        text = stringResource(R.string.retry_button),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = onDismiss
                 ) {
-                    Text(text = stringResource(R.string.ok))
+                    Text(
+                        text = stringResource(R.string.ok),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         )
