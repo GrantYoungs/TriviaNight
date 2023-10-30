@@ -12,15 +12,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -41,7 +43,7 @@ class TriviaNightGameActivity : ComponentActivity() {
 
         setContent {
             TriviaNightTheme(dynamicColor = false) {
-                val viewState by remember { viewModel.viewState }.collectAsState()
+                val viewState by viewModel.viewState.collectAsState()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -138,9 +140,56 @@ class TriviaNightGameActivity : ComponentActivity() {
                             )
                         }
                     }
+
+                    if (viewState.displayErrorDialog) {
+                        ErrorDialog(
+                            title = stringResource(R.string.unable_to_retrieve_questions_title),
+                            message = stringResource(R.string.unable_to_retrieve_questions_message),
+                            onConfirmation = {
+                                viewModel.onAction(TriviaNightGameViewModel.Action.CloseErrorDialog)
+                                viewModel.onAction(TriviaNightGameViewModel.Action.GetTriviaQuestions)
+                            },
+                            onDismiss = {
+                                viewModel.onAction(TriviaNightGameViewModel.Action.CloseErrorDialog)
+                                finish()
+                            }
+                        )
+                    }
                 }
             }
         }
+    }
+
+    @Composable
+    private fun ErrorDialog(
+        title: String,
+        message: String,
+        onConfirmation: () -> Unit,
+        onDismiss: () -> Unit
+    ) {
+        AlertDialog(
+            title = {
+                Text(text = title)
+            },
+            text = {
+                Text(text = message)
+            },
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(
+                    onClick = onConfirmation
+                ) {
+                    Text(text = stringResource(R.string.retry_button))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = onDismiss
+                ) {
+                    Text(text = stringResource(R.string.ok))
+                }
+            }
+        )
     }
 
     companion object {

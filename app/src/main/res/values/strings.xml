@@ -4,4 +4,10 @@
     <string name="welcome_to_trivia_night">Welcome to Trivia Night!</string>
     <string name="lets_play">Let\'s play!</string>
     <string name="next_question">Next Question</string>
+
+    <!-- Error Dialog -->
+    <string name="unable_to_retrieve_questions_title">Unable To Retrieve Questions</string>
+    <string name="unable_to_retrieve_questions_message">Unable to retrieve your trivia questions! Please try again.</string>
+    <string name="retry_button">Retry</string>
+    <string name="ok">Ok</string>
 </resources>

@@ -34,7 +34,8 @@ class TriviaNightGameViewModel @Inject constructor(
         val isLoading: Boolean = false,
         private val triviaQuestions: List<Question> = emptyList(),
         val currentQuestionIndex: Int = 0,
-        val userHasGuessed: Boolean = false
+        val userHasGuessed: Boolean = false,
+        val displayErrorDialog: Boolean = false
     ) {
         val currentQuestion: Question?
             get() = triviaQuestions.getOrNull(currentQuestionIndex)
@@ -42,12 +43,20 @@ class TriviaNightGameViewModel @Inject constructor(
 
     fun onAction(action: Action) {
         when (action) {
+            is Action.GetTriviaQuestions -> {
+                getTriviaQuestions(numQuestions = NUM_QUESTIONS)
+            }
+
             is Action.DisplayNextQuestion -> {
                 displayNextQuestion()
             }
 
             is Action.CheckAnswer -> {
                 checkAnswer(action.answer)
+            }
+
+            is Action.CloseErrorDialog -> {
+                closeErrorDialog()
             }
         }
     }
@@ -69,6 +78,11 @@ class TriviaNightGameViewModel @Inject constructor(
             }.onFailure { exception ->
                 Log.e("Error", exception.message.orEmpty())
                 setLoadingState(false)
+                _viewStateFlow.update { oldState ->
+                    oldState.copy(
+                        displayErrorDialog = true
+                    )
+                }
             }
         }
     }
@@ -100,10 +114,18 @@ class TriviaNightGameViewModel @Inject constructor(
         _viewStateFlow.update { oldState -> oldState.copy(isLoading = isLoading) }
     }
 
+    private fun closeErrorDialog() {
+        _viewStateFlow.update { oldState -> oldState.copy(displayErrorDialog = false) }
+    }
+
     sealed class Action {
+        object GetTriviaQuestions : Action()
+
         object DisplayNextQuestion : Action()
 
         data class CheckAnswer(val answer: String) : Action()
+
+        object CloseErrorDialog : Action()
     }
 
     sealed class Event {
