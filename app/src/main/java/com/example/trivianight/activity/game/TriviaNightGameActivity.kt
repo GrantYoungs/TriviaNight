@@ -121,20 +121,20 @@ class TriviaNightGameActivity : ComponentActivity() {
                         }
 
                         Text(
-                            text = viewState.numCorrectAnswers,
+                            text = viewState.correctAnswerCounter,
                             style = MaterialTheme.typography.displayLarge,
                             color = Color.Green,
                             modifier = Modifier.constrainAs(numCorrectAnswers) {
-                                start.linkTo(parent.start, 24.dp)
+                                start.linkTo(parent.start, 36.dp)
                                 bottom.linkTo(nextQuestionButton.top, 16.dp)
                             }
                         )
                         Text(
-                            text = viewState.numIncorrectAnswers,
+                            text = viewState.incorrectAnswerCounter,
                             style = MaterialTheme.typography.displayLarge,
                             color = Color.Red,
                             modifier = Modifier.constrainAs(numIncorrectAnswers) {
-                                end.linkTo(parent.end, 24.dp)
+                                end.linkTo(parent.end, 36.dp)
                                 bottom.linkTo(nextQuestionButton.top, 16.dp)
                             }
                         )

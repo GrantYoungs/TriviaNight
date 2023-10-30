@@ -40,8 +40,8 @@ class TriviaNightGameViewModel @Inject constructor(
     private fun onNewGameState(gameState: TriviaGameState) {
         _viewStateFlow.update { oldState ->
             oldState.copy(
-                numCorrectAnswers = gameState.numCorrectAnswers.toString(),
-                numIncorrectAnswers = gameState.numIncorrectAnswers.toString(),
+                correctAnswerCounter = gameState.numCorrectAnswers.toString(),
+                incorrectAnswerCounter = gameState.numIncorrectAnswers.toString(),
                 currentQuestion = gameState.currentQuestion?.let { question ->
                     QuestionDecorator.decorate(question = question)
                 }
@@ -55,8 +55,8 @@ class TriviaNightGameViewModel @Inject constructor(
         // val currentQuestionIndex: Int = 0,
         val userHasGuessed: Boolean = false,
         val displayErrorDialog: Boolean = false,
-        val numCorrectAnswers: String = "",
-        val numIncorrectAnswers: String = "",
+        val correctAnswerCounter: String = "",
+        val incorrectAnswerCounter: String = "",
     )
 
     fun onAction(action: Action) {
