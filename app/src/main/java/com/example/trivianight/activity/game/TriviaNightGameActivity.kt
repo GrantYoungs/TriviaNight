@@ -71,18 +71,18 @@ class TriviaNightGameActivity : ComponentActivity() {
                             Text(
                                 text = question.question,
                                 modifier = Modifier
-                                    .fillMaxWidth(0.85f)
+                                    .fillMaxWidth(0.90f)
                                     .constrainAs(questionTitle) {
                                         top.linkTo(parent.top, 80.dp)
                                         centerHorizontallyTo(parent)
                                     },
                                 textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.headlineMedium
+                                style = MaterialTheme.typography.headlineSmall
                             )
 
                             Column(
                                 modifier = Modifier
-                                    .fillMaxWidth(0.65f)
+                                    .fillMaxWidth(0.80f)
                                     .constrainAs(answersList) {
                                         centerHorizontallyTo(parent)
                                         centerVerticallyTo(parent)
