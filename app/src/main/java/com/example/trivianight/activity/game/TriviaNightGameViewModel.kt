@@ -52,7 +52,6 @@ class TriviaNightGameViewModel @Inject constructor(
     data class GameViewState(
         val isLoading: Boolean = false,
         val currentQuestion: QuestionDecorator? = null,
-        // val currentQuestionIndex: Int = 0,
         val userHasGuessed: Boolean = false,
         val displayErrorDialog: Boolean = false,
         val correctAnswerCounter: String = "",
