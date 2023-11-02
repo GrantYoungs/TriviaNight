@@ -3,6 +3,7 @@ package com.example.trivianight.data
 import com.example.trivianight.data.api.OpenTDBApi
 import com.example.trivianight.data.api.TheTriviaApi
 import com.example.trivianight.data.error.TriviaResponseException
+import com.example.trivianight.data.model.domain.Question
 import com.example.trivianight.data.model.network.ResponseCode
 import com.example.trivianight.data.model.network.toDomain
 import com.example.trivianight.util.retrofit.bodyOrError
@@ -33,22 +34,30 @@ class TriviaRepository @Inject constructor(
     suspend fun getTriviaQuestions(numQuestions: Int) {
         withContext(ioDispatcher) {
             // getOpenTDBTriviaQuestions(numQuestions = numQuestions)
-            getTheTriviaApiQuestions()
+            // getTheTriviaApiQuestions()
+
+            val theTriviaApiQuestions = getTheTriviaApiQuestions()
+            val openTDBquestions = getOpenTDBTriviaQuestions(numQuestions = numQuestions)
+
+            theTriviaApiQuestions.plus(openTDBquestions).let { questions ->
+                _gameState.update { oldState ->
+                    oldState.copy(
+                        triviaQuestions = questions,
+                        currentQuestionIndex = 0
+                    )
+                }
+            }
         }
     }
 
-    private suspend fun getOpenTDBTriviaQuestions(numQuestions: Int) {
+    // TODO When one source fails, the user shouldn't be blocked unless every source fails
+    private suspend fun getOpenTDBTriviaQuestions(numQuestions: Int): List<Question> {
         openTDBApi.getTriviaQuestions(numQuestions = numQuestions).let { response ->
             response.bodyOrError()!!.toDomain().let { questions ->
 
-                when (ResponseCode.getResponseCode(questions.responseCode)) {
+                return when (ResponseCode.getResponseCode(questions.responseCode)) {
                     ResponseCode.SUCCESS -> {
-                        _gameState.update { oldState ->
-                            oldState.copy(
-                                triviaQuestions = questions.results,
-                                currentQuestionIndex = 0
-                            )
-                        }
+                       questions.results
                     }
 
                     ResponseCode.NO_RESPONSE -> {
@@ -75,17 +84,10 @@ class TriviaRepository @Inject constructor(
         }
     }
 
-    private suspend fun getTheTriviaApiQuestions() {
-        theTriviaApi.getTriviaQuestions().let { response ->
+    private suspend fun getTheTriviaApiQuestions(): List<Question> {
+        return theTriviaApi.getTriviaQuestions().let { response ->
             response.bodyOrError()!!.let { questionsResponse ->
-                questionsResponse.map { it.toDomain() }.let { questions ->
-                    _gameState.update { oldState ->
-                        oldState.copy(
-                            triviaQuestions = questions,
-                            currentQuestionIndex = 0
-                        )
-                    }
-                }
+                questionsResponse.map { it.toDomain() }
             }
         }
     }

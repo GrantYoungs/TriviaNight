@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 // The default number of questions to retrieve.
 // TODO: Take user input for number of questions
-private const val NUM_QUESTIONS = 10
+private const val NUM_QUESTIONS = 5
 
 @HiltViewModel
 class TriviaNightGameViewModel @Inject constructor(
