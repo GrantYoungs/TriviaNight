@@ -14,7 +14,7 @@ import javax.inject.Singleton
 
 @Singleton
 class TriviaRepository @Inject constructor(
-    private val triviaApi: TriviaApi
+    private val openTDBApi: OpenTDBApi
 ) {
 
     private val ioDispatcher = Dispatchers.IO
@@ -29,38 +29,42 @@ class TriviaRepository @Inject constructor(
      */
     suspend fun getTriviaQuestions(numQuestions: Int) {
         withContext(ioDispatcher) {
-            triviaApi.getTriviaQuestions(numQuestions = numQuestions).let { response ->
-                response.bodyOrError()!!.toDomain().let { questions ->
+            getOpenTDBTriviaQuestions(numQuestions = numQuestions)
+        }
+    }
 
-                    when (ResponseCode.getResponseCode(questions.responseCode)) {
-                        ResponseCode.SUCCESS -> {
-                            _gameState.update { oldState ->
-                                oldState.copy(
-                                    triviaQuestions = questions.results,
-                                    currentQuestionIndex = 0
-                                )
-                            }
-                        }
+    private suspend fun getOpenTDBTriviaQuestions(numQuestions: Int) {
+        openTDBApi.getTriviaQuestions(numQuestions = numQuestions).let { response ->
+            response.bodyOrError()!!.toDomain().let { questions ->
 
-                        ResponseCode.NO_RESPONSE -> {
-                            throw TriviaResponseException.NoResultsException
+                when (ResponseCode.getResponseCode(questions.responseCode)) {
+                    ResponseCode.SUCCESS -> {
+                        _gameState.update { oldState ->
+                            oldState.copy(
+                                triviaQuestions = questions.results,
+                                currentQuestionIndex = 0
+                            )
                         }
+                    }
 
-                        ResponseCode.INVALID_PARAMETER -> {
-                            throw TriviaResponseException.InvalidParameterException
-                        }
+                    ResponseCode.NO_RESPONSE -> {
+                        throw TriviaResponseException.NoResultsException
+                    }
 
-                        ResponseCode.TOKEN_NOT_FOUND -> {
-                            throw TriviaResponseException.TokenNotFoundException
-                        }
+                    ResponseCode.INVALID_PARAMETER -> {
+                        throw TriviaResponseException.InvalidParameterException
+                    }
 
-                        ResponseCode.TOKEN_EMPTY -> {
-                            throw TriviaResponseException.TokenEmptyException
-                        }
+                    ResponseCode.TOKEN_NOT_FOUND -> {
+                        throw TriviaResponseException.TokenNotFoundException
+                    }
 
-                        else -> {
-                            throw TriviaResponseException.UnableToRetrieveResults
-                        }
+                    ResponseCode.TOKEN_EMPTY -> {
+                        throw TriviaResponseException.TokenEmptyException
+                    }
+
+                    else -> {
+                        throw TriviaResponseException.UnableToRetrieveResults
                     }
                 }
             }

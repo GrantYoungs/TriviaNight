@@ -5,7 +5,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface TriviaApi {
+interface OpenTDBApi {
 
     /**
      * Retrieves trivia questions to be displayed to the user.
