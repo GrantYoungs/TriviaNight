@@ -1,5 +1,7 @@
 package com.example.trivianight.data
 
+import com.example.trivianight.data.api.OpenTDBApi
+import com.example.trivianight.data.api.TheTriviaApi
 import com.example.trivianight.data.error.TriviaResponseException
 import com.example.trivianight.data.model.network.ResponseCode
 import com.example.trivianight.data.model.network.toDomain
@@ -14,7 +16,8 @@ import javax.inject.Singleton
 
 @Singleton
 class TriviaRepository @Inject constructor(
-    private val openTDBApi: OpenTDBApi
+    private val openTDBApi: OpenTDBApi,
+    private val theTriviaApi: TheTriviaApi
 ) {
 
     private val ioDispatcher = Dispatchers.IO
@@ -29,7 +32,8 @@ class TriviaRepository @Inject constructor(
      */
     suspend fun getTriviaQuestions(numQuestions: Int) {
         withContext(ioDispatcher) {
-            getOpenTDBTriviaQuestions(numQuestions = numQuestions)
+            // getOpenTDBTriviaQuestions(numQuestions = numQuestions)
+            getTheTriviaApiQuestions()
         }
     }
 
@@ -65,6 +69,21 @@ class TriviaRepository @Inject constructor(
 
                     else -> {
                         throw TriviaResponseException.UnableToRetrieveResults
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun getTheTriviaApiQuestions() {
+        theTriviaApi.getTriviaQuestions().let { response ->
+            response.bodyOrError()!!.let { questionsResponse ->
+                questionsResponse.map { it.toDomain() }.let { questions ->
+                    _gameState.update { oldState ->
+                        oldState.copy(
+                            triviaQuestions = questions,
+                            currentQuestionIndex = 0
+                        )
                     }
                 }
             }

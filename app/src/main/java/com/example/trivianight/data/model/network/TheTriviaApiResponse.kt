@@ -24,7 +24,7 @@ data class TheTriviaApiResponse(
     val incorrectAnswers: List<String>,
 
     @Json(name = "question")
-    val question: String,
+    val question: TheTriviaApiResponseQuestion,
 
     @Json(name = "tags")
     val tags: List<String>,
@@ -42,12 +42,18 @@ data class TheTriviaApiResponse(
     val isNiche: Boolean
 )
 
+@JsonClass(generateAdapter = true)
+data class TheTriviaApiResponseQuestion(
+    @Json(name = "text")
+    val text: String
+)
+
 fun TheTriviaApiResponse.toDomain(): Question {
     return Question(
         category = category,
         type = type,
         difficulty = difficulty,
-        question = question,
+        question = question.text,
         correctAnswer = Answer(
             value = correctAnswer,
             isCorrect = true

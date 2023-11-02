@@ -1,4 +1,4 @@
-package com.example.trivianight.data
+package com.example.trivianight.data.api
 
 import com.example.trivianight.data.model.network.OpenTDBResponse
 import retrofit2.Response

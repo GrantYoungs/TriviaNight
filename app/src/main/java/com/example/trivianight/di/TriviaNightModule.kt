@@ -1,7 +1,8 @@
 package com.example.trivianight.di
 
-import com.example.trivianight.data.OpenTDBApi
 import com.example.trivianight.data.TriviaRepository
+import com.example.trivianight.data.api.OpenTDBApi
+import com.example.trivianight.data.api.TheTriviaApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,6 +11,7 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.Retrofit.Builder
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
@@ -56,9 +58,27 @@ object TriviaNightModule {
 
     @Singleton
     @Provides
+    fun provideTheTriviaApi(
+        @TriviaUrls.TheTriviaApi baseUrl: HttpUrl,
+        okHttpClient: OkHttpClient,
+        baseRetrofit: Builder
+    ): TheTriviaApi {
+        return baseRetrofit
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
+            .build()
+            .create(TheTriviaApi::class.java)
+    }
+
+    @Singleton
+    @Provides
     fun provideTriviaRepository(
-        openTDBApi: OpenTDBApi
+        openTDBApi: OpenTDBApi,
+        theTriviaApi: TheTriviaApi
     ): TriviaRepository {
-        return TriviaRepository(openTDBApi = openTDBApi)
+        return TriviaRepository(
+            openTDBApi = openTDBApi,
+            theTriviaApi = theTriviaApi
+        )
     }
 }
