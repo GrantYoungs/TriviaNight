@@ -19,6 +19,9 @@ enum class ResponseCode(val value: Int) {
     }
 }
 
+/**
+ * JSON Response from Open TDB: https://opentdb.com/
+ */
 @JsonClass(generateAdapter = true)
 data class OpenTDBResponse(
     @Json(name = "response_code")
