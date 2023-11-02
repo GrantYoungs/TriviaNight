@@ -20,16 +20,16 @@ enum class ResponseCode(val value: Int) {
 }
 
 @JsonClass(generateAdapter = true)
-data class TriviaQuestionsResponse(
+data class OpenTDBResponse(
     @Json(name = "response_code")
     val responseCode: Int,
 
     @Json(name = "results")
-    val results: List<QuestionResponse>
+    val results: List<OpenTDBQuestionResponse>
 )
 
 @JsonClass(generateAdapter = true)
-data class QuestionResponse(
+data class OpenTDBQuestionResponse(
     @Json(name = "category")
     val category: String,
 
@@ -49,14 +49,14 @@ data class QuestionResponse(
     val incorrectAnswers: List<String>
 )
 
-fun TriviaQuestionsResponse.toDomain(): TriviaQuestions {
+fun OpenTDBResponse.toDomain(): TriviaQuestions {
     return TriviaQuestions(
         responseCode = responseCode,
         results = results.map { it.toDomain() }
     )
 }
 
-fun QuestionResponse.toDomain(): Question {
+fun OpenTDBQuestionResponse.toDomain(): Question {
     return Question(
         category = fromHtml(category),
         type = fromHtml(type),

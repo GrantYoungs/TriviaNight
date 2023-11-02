@@ -18,7 +18,14 @@ import javax.inject.Singleton
 object TriviaNightModule {
 
     @Provides
-    fun provideBaseUrl(): HttpUrl = "https://opentdb.com/".toHttpUrl()
+    @Singleton
+    @TriviaUrls.OpenTDB
+    fun provideOpenTDBBaseUrl(): HttpUrl = "https://opentdb.com/".toHttpUrl()
+
+    @Provides
+    @Singleton
+    @TriviaUrls.TheTriviaApi
+    fun provideTheTriviaApiBaseUrl(): HttpUrl = "https://the-trivia-api.com/v2/".toHttpUrl()
 
     @Provides
     @Singleton
@@ -36,7 +43,7 @@ object TriviaNightModule {
     @Singleton
     @Provides
     fun provideTriviaNightApi(
-        baseUrl: HttpUrl,
+        @TriviaUrls.OpenTDB baseUrl: HttpUrl,
         okHttpClient: OkHttpClient,
         baseRetrofit: Retrofit.Builder
     ): TriviaApi {
