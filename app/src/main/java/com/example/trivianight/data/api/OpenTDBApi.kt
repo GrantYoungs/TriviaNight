@@ -8,11 +8,11 @@ import retrofit2.http.Query
 interface OpenTDBApi {
 
     /**
-     * Retrieves trivia questions to be displayed to the user.
+     * Retrieves trivia questions from OpenTDB.
      *
      * @param numQuestions The number of questions to retrieve.
      *
-     * @return [OpenTDBResponse]
+     * @return [Response]<[OpenTDBResponse]>
      */
     @GET("api.php")
     suspend fun getTriviaQuestions(

@@ -1,5 +1,6 @@
 package com.example.trivianight.data
 
+import android.util.Log
 import com.example.trivianight.data.api.OpenTDBApi
 import com.example.trivianight.data.api.TheTriviaApi
 import com.example.trivianight.data.error.TriviaResponseException
@@ -8,12 +9,14 @@ import com.example.trivianight.data.model.network.ResponseCode
 import com.example.trivianight.data.model.network.toDomain
 import com.example.trivianight.util.retrofit.bodyOrError
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.coroutineContext
 
 @Singleton
 class TriviaRepository @Inject constructor(
@@ -30,19 +33,19 @@ class TriviaRepository @Inject constructor(
      * Retrieve a list of Trivia Questions.
      *
      * @param numQuestions The number of questions to retrieve.
+     * @return true if questions have been retrieved successfully.
      */
-    suspend fun getTriviaQuestions(numQuestions: Int) {
-        withContext(ioDispatcher) {
-            // getOpenTDBTriviaQuestions(numQuestions = numQuestions)
-            // getTheTriviaApiQuestions()
+    suspend fun getTriviaQuestions(numQuestions: Int): Boolean {
+        return withContext(ioDispatcher) {
+            val triviaQuestions: MutableList<Question> = mutableListOf()
 
-            val theTriviaApiQuestions = getTheTriviaApiQuestions()
-            val openTDBquestions = getOpenTDBTriviaQuestions(numQuestions = numQuestions)
+            getTheTriviaApiQuestions()?.let { triviaQuestions.addAll(it) }
+            getOpenTDBTriviaQuestions(numQuestions = numQuestions)?.let { triviaQuestions.addAll(it) }
 
-            theTriviaApiQuestions.plus(openTDBquestions).let { questions ->
+            triviaQuestions.isNotEmpty().also {
                 _gameState.update { oldState ->
                     oldState.copy(
-                        triviaQuestions = questions,
+                        triviaQuestions = triviaQuestions.shuffled(),
                         currentQuestionIndex = 0
                     )
                 }
@@ -50,45 +53,65 @@ class TriviaRepository @Inject constructor(
         }
     }
 
-    // TODO When one source fails, the user shouldn't be blocked unless every source fails
-    private suspend fun getOpenTDBTriviaQuestions(numQuestions: Int): List<Question> {
-        openTDBApi.getTriviaQuestions(numQuestions = numQuestions).let { response ->
-            response.bodyOrError()!!.toDomain().let { questions ->
+    /**
+     * Retrieve trivia questions from OpenTDB.
+     *
+     * @return [List]<[Question]> if successful.
+     */
+    private suspend fun getOpenTDBTriviaQuestions(numQuestions: Int): List<Question>? {
+        return runCatching {
+            openTDBApi.getTriviaQuestions(numQuestions = numQuestions).let { response ->
+                response.bodyOrError()!!.toDomain().let { questions ->
+                    return when (ResponseCode.getResponseCode(questions.responseCode)) {
+                        ResponseCode.SUCCESS -> {
+                            questions.results
+                        }
 
-                return when (ResponseCode.getResponseCode(questions.responseCode)) {
-                    ResponseCode.SUCCESS -> {
-                       questions.results
-                    }
+                        ResponseCode.NO_RESPONSE -> {
+                            throw TriviaResponseException.NoResultsException
+                        }
 
-                    ResponseCode.NO_RESPONSE -> {
-                        throw TriviaResponseException.NoResultsException
-                    }
+                        ResponseCode.INVALID_PARAMETER -> {
+                            throw TriviaResponseException.InvalidParameterException
+                        }
 
-                    ResponseCode.INVALID_PARAMETER -> {
-                        throw TriviaResponseException.InvalidParameterException
-                    }
+                        ResponseCode.TOKEN_NOT_FOUND -> {
+                            throw TriviaResponseException.TokenNotFoundException
+                        }
 
-                    ResponseCode.TOKEN_NOT_FOUND -> {
-                        throw TriviaResponseException.TokenNotFoundException
-                    }
+                        ResponseCode.TOKEN_EMPTY -> {
+                            throw TriviaResponseException.TokenEmptyException
+                        }
 
-                    ResponseCode.TOKEN_EMPTY -> {
-                        throw TriviaResponseException.TokenEmptyException
-                    }
-
-                    else -> {
-                        throw TriviaResponseException.UnableToRetrieveResults
+                        else -> {
+                            throw TriviaResponseException.UnableToRetrieveResults
+                        }
                     }
                 }
             }
+        }.getOrElse { exception ->
+            coroutineContext.ensureActive()
+            Log.e(LOG_TAG, exception.toString())
+            if (exception is Error) throw exception
+
+            null
         }
     }
 
-    private suspend fun getTheTriviaApiQuestions(): List<Question> {
-        return theTriviaApi.getTriviaQuestions().let { response ->
-            response.bodyOrError()!!.let { questionsResponse ->
-                questionsResponse.map { it.toDomain() }
-            }
+    /**
+     * Retrieve trivia questions from TheTriviaApi.
+     *
+     * @return [List]<[Question]> if successful.
+     */
+    private suspend fun getTheTriviaApiQuestions(): List<Question>? {
+        return runCatching {
+            theTriviaApi.getTriviaQuestions().bodyOrError()!!.map { it.toDomain() }
+        }.getOrElse { exception ->
+            coroutineContext.ensureActive()
+            Log.e(LOG_TAG, exception.toString())
+            if (exception is Error) throw exception
+
+            null
         }
     }
 
@@ -117,5 +140,9 @@ class TriviaRepository @Inject constructor(
         _gameState.update { oldState ->
             oldState.copy(currentQuestionIndex = oldState.currentQuestionIndex + 1)
         }
+    }
+
+    companion object {
+        private const val LOG_TAG = "TriviaRepository"
     }
 }

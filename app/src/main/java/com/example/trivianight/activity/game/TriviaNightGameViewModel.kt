@@ -1,6 +1,5 @@
 package com.example.trivianight.activity.game
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trivianight.data.TriviaGameState
@@ -82,13 +81,11 @@ class TriviaNightGameViewModel @Inject constructor(
         viewModelScope.launch {
             setLoadingState(true)
 
-            runCatching {
-                triviaRepository.getTriviaQuestions(numQuestions = numQuestions)
-            }.onSuccess {
-                setLoadingState(false)
-            }.onFailure { exception ->
-                Log.e("Error", exception.message.orEmpty())
-                setLoadingState(false)
+            val isSuccessful = triviaRepository.getTriviaQuestions(numQuestions = numQuestions)
+
+            setLoadingState(false)
+
+            if (!isSuccessful) {
                 _viewStateFlow.update { oldState ->
                     oldState.copy(
                         displayErrorDialog = true
