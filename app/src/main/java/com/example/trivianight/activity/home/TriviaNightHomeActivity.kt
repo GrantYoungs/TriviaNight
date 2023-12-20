@@ -57,7 +57,7 @@ class TriviaNightHomeActivity : ComponentActivity() {
                                 centerVerticallyTo(parent)
                             },
                             textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.titleLarge
+                            style = MaterialTheme.typography.headlineLarge
                         )
 
                         Button(
@@ -65,7 +65,7 @@ class TriviaNightHomeActivity : ComponentActivity() {
                                 viewModel.onAction(TriviaNightHomeViewModel.Action.StartTriviaGame)
                             },
                             modifier = Modifier
-                                .size(width = 300.dp, height = 50.dp)
+                                .size(width = 300.dp, height = 60.dp)
                                 .constrainAs(getStartedButton) {
                                     top.linkTo(title.bottom, 20.dp)
                                     centerHorizontallyTo(parent)
@@ -75,7 +75,8 @@ class TriviaNightHomeActivity : ComponentActivity() {
                             )
                         ) {
                             Text(
-                                text = stringResource(R.string.lets_play)
+                                text = stringResource(R.string.lets_play),
+                                style = MaterialTheme.typography.titleLarge
                             )
                         }
                     }
