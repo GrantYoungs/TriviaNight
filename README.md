@@ -4,7 +4,7 @@ A trivia app for Android!
 Bored at home with nothing to do? Test your random knowledge! How many can you get correct?
 
 # Trivia Questions
-Trivia Night pulls trivia questions from [Open Trivia Database](https://opentdb.com/) and [The Trivia API](https://the-trivia-api.com/), both of which are free public APIs. In the future, I would like to curate questions host my own API.
+Trivia Night pulls trivia questions from [Open Trivia Database](https://opentdb.com/) and [The Trivia API](https://the-trivia-api.com/), both of which are free public APIs. In the future, I would like to curate questions and host my own API.
 
 # Getting Started
 Getting started with Trivia Night is very easy!
